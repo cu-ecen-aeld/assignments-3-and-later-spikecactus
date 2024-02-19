@@ -1,5 +1,12 @@
 #include "systemcalls.h"
-
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
 /**
  * @param cmd the command to execute with system()
  * @return true if the command in @param cmd was executed
@@ -16,7 +23,19 @@ bool do_system(const char *cmd)
  *   and return a boolean true if the system() call completed with success
  *   or false() if it returned a failure
 */
-
+    int ret = system(cmd);
+    if(ret == -1)
+    {
+        return false;
+    }
+    if(WIFEXITED(ret))
+    {
+        int exit_status = WEXITSTATUS(ret);
+        if(exit_status != 0)
+        {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -58,6 +77,42 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
+    fflush(stdout);
+    pid_t pid = fork();
+    int status;
+    if(pid == -1)
+    {
+        return false;
+    }
+    else if(pid == 0)
+    {
+        //child process
+        status = execv(command[0], command);
+        if(status == -1)
+        {
+            perror("execv");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        //parent status
+        
+        wait(&status);
+        if(WIFEXITED(status))
+        {
+            if(WEXITSTATUS(status))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            //did not terminate normally
+            return false;
+        }
+    }
+
 
     va_end(args);
 
@@ -92,7 +147,45 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+    int status;
+    pid_t pid;
 
+    int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    if (fd < 0) { perror("open"); abort(); }
+    pid = fork();
+    if(pid == -1) { perror("fork"); abort();}
+    else if (pid == 0)
+    {
+        if (dup2(fd, 1) < 0) { perror("dup2"); abort(); }
+        close(fd);
+        status = execv(command[0], command);
+        if(status != 0)
+        {
+            perror("execv");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        wait(&status);
+        if(WIFEXITED(status))
+        {
+            if(WEXITSTATUS(status))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            //did not terminate normally
+            return false;
+        }
+    }
+            
+
+
+    
+    close(fd);
     va_end(args);
 
     return true;
