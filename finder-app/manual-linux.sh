@@ -13,6 +13,7 @@ FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
 CROSS_COMPILE=aarch64-none-linux-gnu-
 TOOLCHAIN=/home/henry/Downloads/gcc-arm-10.2-2020.11-x86_64-aarch64-none-linux-gnu
+LIBC=/usr/local/gcc-arm-10.2-2020.11-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc
 
 if [ $# -lt 1 ]
 then
@@ -83,11 +84,10 @@ echo "Library dependencies"
 
 # TODO: Add library dependencies to rootfs
 cd ../rootfs
-cp ${FINDER_APP_DIR}/toolchain/ld-linux-aarch64.so.1 lib/
-cp ${FINDER_APP_DIR}/toolchain/libm.so.6 lib64/
-cp ${FINDER_APP_DIR}/toolchain/libresolv.so.2 lib64/
-cp ${FINDER_APP_DIR}/toolchain/libc.so.6 lib64/
-
+cp ${LIBC}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
+cp ${LIBC}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64
+cp ${LIBC}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64
+cp ${LIBC}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64
 sudo mknod -m 666 dev/null c 1 3
 sudo mknod -m 600 dev/console c 5 1
 # TODO: Clean and build the writer utility
