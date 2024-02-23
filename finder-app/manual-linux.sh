@@ -25,6 +25,9 @@ fi
 
 mkdir -p ${OUTDIR}
 
+#debug
+cd ${LIBC}
+
 cd "$OUTDIR"
 if [ ! -d "${OUTDIR}/linux-stable" ]; then
     #Clone only if the repository does not exist.
@@ -84,10 +87,10 @@ echo "Library dependencies"
 
 # TODO: Add library dependencies to rootfs
 cd ../rootfs
-cp ${LIBC}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
-cp ${LIBC}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64
-cp ${LIBC}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64
-cp ${LIBC}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64
+sudo cp ${LIBC}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
+sudo cp ${LIBC}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64
+sudo cp ${LIBC}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64
+sudo cp ${LIBC}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64
 sudo mknod -m 666 dev/null c 1 3
 sudo mknod -m 600 dev/console c 5 1
 # TODO: Clean and build the writer utility
