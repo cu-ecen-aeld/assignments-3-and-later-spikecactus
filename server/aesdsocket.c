@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
     }
 
     closelog();
-    syslog(LOG_USER, "losed connection from %s", ip_addr);
+    syslog(LOG_USER, "lost connection from %s", ip_addr);
     close(server_fd);
     close(new_fd);
     remove(DATA_FILE_PATH);
