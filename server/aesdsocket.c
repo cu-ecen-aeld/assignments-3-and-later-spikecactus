@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
         fclose(data_file);
 
         // Send response to client
-        char response[] = "ACK\n";
+        // char response[] = "ACK\n";
 
         if ((data_file = fopen(DATA_FILE_PATH, "r")) == NULL) {
             syslog(LOG_ERR, "Error opening file");
